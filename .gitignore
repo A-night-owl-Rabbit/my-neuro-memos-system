@@ -1,0 +1,28 @@
+# User data (personal memories, knowledge graph, vector DB)
+data/memory_store.json
+data/graph_store.json
+data/qdrant/
+data/images/originals/
+data/images/image_metadata.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+*.env
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

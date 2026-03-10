@@ -1,0 +1,28 @@
+# MemOS Backend Dependencies
+
+# Web framework
+fastapi
+uvicorn[standard]
+pydantic
+
+# ML / Search
+numpy
+scikit-learn
+sentence-transformers
+
+# Vector database
+qdrant-client
+
+# Async HTTP (for entity extraction)
+aiohttp
+
+# WebUI
+streamlit
+requests
+
+# Image processing (optional)
+Pillow
+
+# Knowledge graph (optional)
+# neo4j
+# networkx is stdlib-compatible, using built-in json graph storage

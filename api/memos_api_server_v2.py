@@ -1367,11 +1367,23 @@ async def search_memory(request: SearchMemoryRequest):
                         for mem_id in graph_memory_ids[:5]:
                             if mem_id not in result_ids:
                                 memory = qdrant_client.get_memory(mem_id)
-                                if memory and memory.get('payload', {}).get('user_id') == user_id:
-                                    memory['graph_boost'] = 0.2
-                                    memory['similarity'] = 0.5  # 基础相似度
-                                    memory['graph_only'] = True
-                                    results.append(memory)
+                                pl = (memory or {}).get('payload') or {}
+                                if memory and pl.get('user_id') == user_id:
+                                    # get_memory 返回的是 {id, content, payload}，时间戳在 payload 内，需展平否则检索结果无 created_at
+                                    row = {
+                                        'id': memory.get('id'),
+                                        'content': memory.get('content') or pl.get('content', ''),
+                                        'similarity': 0.5,
+                                        'importance': pl.get('importance', 0.5),
+                                        'memory_type': pl.get('memory_type', 'general'),
+                                        'tags': pl.get('tags', []),
+                                        'created_at': pl.get('created_at') or pl.get('timestamp'),
+                                        'updated_at': pl.get('updated_at'),
+                                        'entity_ids': pl.get('entity_ids', []),
+                                        'graph_boost': 0.2,
+                                        'graph_only': True,
+                                    }
+                                    results.append(row)
                                     graph_only_count += 1
                         
                         if graph_boost_count > 0 or graph_only_count > 0:
@@ -1416,19 +1428,32 @@ async def search_memory(request: SearchMemoryRequest):
         # 格式化返回
         formatted_results = []
         for r in results:
+            pl = r.get('payload') if isinstance(r.get('payload'), dict) else {}
+            created_at = (
+                r.get('created_at')
+                or r.get('timestamp')
+                or pl.get('created_at')
+                or pl.get('timestamp')
+            )
+            updated_at = r.get('updated_at') or pl.get('updated_at')
+            _tags = r.get('tags')
+            if not isinstance(_tags, list):
+                _tags = pl.get('tags', [])
             item = {
-                "content": r.get('content', ''),
+                "content": r.get('content') or pl.get('content', ''),
                 "similarity": round(r.get('similarity', 0), 4),
-                "importance": r.get('importance', 0.5),
-                "memory_type": r.get('memory_type', 'general'),
-                "tags": r.get('tags', []),
+                "importance": r.get('importance', pl.get('importance', 0.5)),
+                "memory_type": r.get('memory_type', pl.get('memory_type', 'general')),
+                "tags": _tags,
                 "type_weight": r.get('type_weight', 1.0),
                 "graph_boost": round(r.get('graph_boost', 0), 4),
                 "final_score": round(r.get('final_score', 0), 4),
-                "timestamp": r.get('created_at'),
-                "created_at": r.get('created_at'),
-                "updated_at": r.get('updated_at')
+                "timestamp": created_at,
+                "created_at": created_at,
+                "updated_at": updated_at,
             }
+            if r.get('id') is not None:
+                item["id"] = r.get('id')
             # 添加 BM25 相关字段（如果启用）
             if enable_bm25:
                 item["vector_score"] = round(r.get('vector_score', 0), 4)

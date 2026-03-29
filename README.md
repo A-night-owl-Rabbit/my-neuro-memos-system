@@ -4,6 +4,8 @@
 
 **前端插件仓库** → [my-neuro-plugin-memos](https://github.com/A-night-owl-Rabbit/my-neuro-plugin-memos)
 
+**最近更新（2026-03-29）**：`/search` 修复图谱补全记忆缺少 `created_at` 的问题，并对返回项做 `payload` 时间兜底、可选返回 `id`。详见 [CHANGELOG.md](./CHANGELOG.md)。
+
 ---
 
 ## 功能概览

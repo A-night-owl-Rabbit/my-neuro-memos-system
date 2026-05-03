@@ -3,15 +3,18 @@
 # Web framework
 fastapi
 uvicorn[standard]
-pydantic
+pydantic>=2.0.0
+
+#RAG依赖
+sentence-transformers
+watchdog
 
 # ML / Search
 numpy
 scikit-learn
 sentence-transformers
 
-# Vector database
-qdrant-client
+qdrant-client>=1.7.0
 
 # Async HTTP (for entity extraction)
 aiohttp
@@ -25,4 +28,19 @@ Pillow
 
 # Knowledge graph (optional)
 # neo4j
-# networkx is stdlib-compatible, using built-in json graph storage
+networkx>=3.0
+
+# 检索增强
+rank-bm25>=0.2.2
+
+# 知识图谱可视化（WebUI 使用）
+pyvis>=0.3.0
+
+# 文档处理
+pypdf>=3.0.0
+beautifulsoup4>=4.12.0
+
+# CLIP 图像理解（用于图片记忆的高级检索）
+transformers>=4.30.0
+#webUI依赖
+flask
